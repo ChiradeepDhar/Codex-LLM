@@ -6,6 +6,7 @@ This is a compact Python project for learning and using LLM + agentic AI concept
 
 - `basic`: send a direct prompt to a model and print the response
 - `demo`: run a no-cost offline walkthrough and save a demo report
+- `reports`: list saved Markdown reports and JSON traces
 - `ask`: ask questions about the current workspace
 - `agent`: run a tool-using assistant with optional JSON trace output
 - `project-brief`: generate a saved Markdown report under `runs/`
@@ -65,6 +66,7 @@ python -m llm_agent_starter.main doctor
 python -m llm_agent_starter.main show-config
 python -m llm_agent_starter.main doctor
 python -m llm_agent_starter.main demo
+python -m llm_agent_starter.main reports
 python -m llm_agent_starter.main basic --prompt "Explain agentic AI in practical terms."
 python -m llm_agent_starter.main ask "What are the important files in this project?"
 python -m llm_agent_starter.main agent --task "Read README.md and summarize how to run this project." --save-trace
@@ -92,6 +94,7 @@ OPENAI_API_KEY=ollama
 - Tools are intentionally read-only.
 - File reads are limited by `MAX_FILE_BYTES`.
 - Output artifacts are written to `OUTPUT_DIR`, which defaults to `runs/`.
+- Use `python -m llm_agent_starter.main reports` to find generated Markdown reports and JSON traces.
 - `.env.example` is a template only and must never contain real secrets.
 
 ## Next production steps

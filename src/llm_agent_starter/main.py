@@ -12,7 +12,7 @@ from llm_agent_starter.config import load_settings
 from llm_agent_starter.demo import build_offline_demo
 from llm_agent_starter.llm_basic import run_basic_prompt
 from llm_agent_starter.logging_config import configure_logging
-from llm_agent_starter.reporting import write_markdown_report
+from llm_agent_starter.reporting import format_artifact_table, list_artifacts, write_markdown_report
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -29,7 +29,14 @@ def build_parser() -> argparse.ArgumentParser:
     doctor.set_defaults(command="doctor")
 
     demo = subparsers.add_parser("demo", help="Run a no-cost offline demo and save a report.")
+    demo.add_argument("--title", default="offline-demo", help="Title used in the saved report filename and heading.")
+    demo.add_argument("--preview-chars", type=int, default=1200, help="Number of report characters to preview.")
     demo.set_defaults(command="demo")
+
+    reports = subparsers.add_parser("reports", help="List saved Markdown reports and JSON traces.")
+    reports.add_argument("--limit", type=int, default=10, help="Maximum number of artifacts to show.")
+    reports.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
+    reports.set_defaults(command="reports")
 
     basic = subparsers.add_parser("basic", help="Run a simple LLM prompt.")
     basic.add_argument("--prompt", required=True, help="Prompt to send to the model.")
@@ -110,10 +117,18 @@ def main() -> None:
         return
 
     if args.command == "demo":
-        result = build_offline_demo(settings)
+        result = build_offline_demo(settings, title=args.title)
         print(f"Offline demo report saved to: {result.report_path}")
         print("\nPreview:")
-        print(result.report[:1200])
+        print(result.report[: args.preview_chars])
+        return
+
+    if args.command == "reports":
+        artifacts = list_artifacts(settings, limit=args.limit)
+        if args.json:
+            print(json.dumps(artifacts, indent=2))
+        else:
+            print(format_artifact_table(artifacts))
         return
 
     client = build_client(settings)

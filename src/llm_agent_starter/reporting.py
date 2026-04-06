@@ -41,3 +41,36 @@ def write_json_artifact(settings: Settings, title: str, payload: dict[str, Any])
 
     path.write_text(json.dumps(payload, indent=2, default=default), encoding="utf-8")
     return path
+
+
+def list_artifacts(settings: Settings, limit: int = 10) -> list[dict[str, Any]]:
+    output_dir = ensure_output_dir(settings)
+    artifacts = [path for path in output_dir.iterdir() if path.is_file() and path.suffix in {".md", ".json"}]
+    artifacts.sort(key=lambda path: path.stat().st_mtime, reverse=True)
+
+    results: list[dict[str, Any]] = []
+    for path in artifacts[:limit]:
+        stats = path.stat()
+        results.append(
+            {
+                "name": path.name,
+                "path": str(path),
+                "type": path.suffix.lstrip("."),
+                "bytes": stats.st_size,
+                "modified": datetime.fromtimestamp(stats.st_mtime).isoformat(timespec="seconds"),
+            }
+        )
+    return results
+
+
+def format_artifact_table(artifacts: list[dict[str, Any]]) -> str:
+    if not artifacts:
+        return "No reports or artifacts found yet."
+
+    lines = ["Name | Type | Bytes | Modified | Path", "--- | --- | ---: | --- | ---"]
+    for artifact in artifacts:
+        lines.append(
+            f"{artifact['name']} | {artifact['type']} | {artifact['bytes']} | "
+            f"{artifact['modified']} | {artifact['path']}"
+        )
+    return "\n".join(lines)
