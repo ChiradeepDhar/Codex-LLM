@@ -13,6 +13,12 @@ dependencies = [
     "python-dotenv>=1.0.1",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.6.0",
+]
+
 [project.scripts]
 ai-starter = "llm_agent_starter.main:main"
 
@@ -21,3 +27,11 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-p", "no:cacheprovider"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
